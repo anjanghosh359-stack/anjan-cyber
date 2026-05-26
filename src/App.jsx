@@ -29,19 +29,17 @@ export default function CyberSecurityWebsite() {
     const files = Array.from(e.target.files);
 
     for (const file of files) {
+
       const formData = new FormData();
 
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
 
-      const resourceType =
-        file.type === "application/pdf"
-          ? "raw"
-          : "image";
-
-      const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`;
+      // AUTO TYPE
+      const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
       try {
+
         const response = await fetch(url, {
           method: "POST",
           body: formData,
@@ -50,6 +48,7 @@ export default function CyberSecurityWebsite() {
         const data = await response.json();
 
         if (data.secure_url) {
+
           setUploadedFiles((prev) => [
             ...prev,
             {
@@ -59,21 +58,29 @@ export default function CyberSecurityWebsite() {
           ]);
 
           alert("File Uploaded Successfully");
+
         } else {
+
           alert("Upload Failed");
           console.log(data);
+
         }
+
       } catch (error) {
+
         console.log(error);
         alert("Error Uploading File");
+
       }
     }
   };
 
-  // PASSWORD SCREEN
+  // PASSWORD PAGE
   if (!access) {
+
     return (
       <div className="bg-black min-h-screen flex items-center justify-center px-6">
+
         <div className="bg-[#050505] border border-green-500 p-10 rounded-3xl w-full max-w-md text-center">
 
           <h2 className="text-4xl font-bold text-green-400 mb-6">
@@ -94,26 +101,35 @@ export default function CyberSecurityWebsite() {
 
           <button
             onClick={() => {
+
               if (password === WEBSITE_PASSWORD) {
+
                 setAccess(true);
+
               } else {
+
                 alert("Wrong Password");
+
               }
+
             }}
             className="w-full bg-green-400 text-black py-3 rounded-xl font-bold hover:bg-white transition"
           >
             Enter Website
           </button>
+
         </div>
       </div>
     );
   }
 
   return (
+
     <div className="bg-black text-white min-h-screen font-sans overflow-x-hidden">
 
       {/* NAVBAR */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/70 border-b border-green-500">
+
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
           <h1 className="text-3xl font-extrabold text-green-400 tracking-wider">
@@ -121,6 +137,7 @@ export default function CyberSecurityWebsite() {
           </h1>
 
           <div className="hidden md:flex gap-8 text-lg">
+
             <a href="#home" className="hover:text-green-400">
               Home
             </a>
@@ -136,6 +153,7 @@ export default function CyberSecurityWebsite() {
             <a href="#contact" className="hover:text-green-400">
               Contact
             </a>
+
           </div>
         </div>
       </nav>
@@ -145,6 +163,7 @@ export default function CyberSecurityWebsite() {
         id="home"
         className="flex items-center justify-center min-h-screen px-6 text-center"
       >
+
         <div className="max-w-5xl">
 
           <p className="text-green-400 text-xl mb-4 tracking-[5px]">
@@ -152,17 +171,24 @@ export default function CyberSecurityWebsite() {
           </p>
 
           <h2 className="text-5xl md:text-7xl font-black leading-tight mb-8">
+
             Welcome To My
+
             <span className="text-green-400">
               {" "}Cyber Security
-            </span>{" "}
-            Website
+            </span>
+
+            {" "}Website
+
           </h2>
 
           <p className="text-lg md:text-2xl text-gray-300 leading-9 max-w-4xl mx-auto">
+
             Upload and access cyber security notes,
             PDFs, images and study materials.
+
           </p>
+
         </div>
       </section>
 
@@ -180,13 +206,17 @@ export default function CyberSecurityWebsite() {
             <p className="text-gray-400 text-lg">
               Open uploaded PDFs and study materials.
             </p>
+
           </div>
 
           {uploadedFiles.length === 0 ? (
+
             <p className="text-center text-gray-400 text-xl">
               No files uploaded yet.
             </p>
+
           ) : (
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
               {uploadedFiles.map((file, index) => (
@@ -204,20 +234,28 @@ export default function CyberSecurityWebsite() {
                     {file.name}
                   </h4>
 
+                  <p className="text-gray-300 mb-6">
+                    Uploaded Study Material
+                  </p>
+
                   <a
                     href={file.url}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                   >
+
                     <button className="w-full bg-green-400 text-black py-3 rounded-2xl font-bold hover:bg-white transition">
                       Open Notes
                     </button>
+
                   </a>
 
                 </div>
               ))}
+
             </div>
           )}
+
         </div>
       </section>
 
@@ -255,6 +293,7 @@ export default function CyberSecurityWebsite() {
             </label>
 
           </div>
+
         </div>
       </section>
 
@@ -278,6 +317,7 @@ export default function CyberSecurityWebsite() {
             </p>
 
           </div>
+
         </div>
       </section>
 
@@ -285,6 +325,7 @@ export default function CyberSecurityWebsite() {
       <footer className="border-t border-green-500 py-8 text-center text-gray-400 bg-black">
         © 2026 ANJAN CYBER SECURITY
       </footer>
+
     </div>
   );
 }
