@@ -17,6 +17,7 @@ export default function CyberSecurityWebsite() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // SAVE FILES
   useEffect(() => {
     localStorage.setItem(
       "uploadedFiles",
@@ -26,6 +27,7 @@ export default function CyberSecurityWebsite() {
 
   // FILE UPLOAD
   const handleUpload = async (e) => {
+
     const files = Array.from(e.target.files);
 
     for (const file of files) {
@@ -35,7 +37,6 @@ export default function CyberSecurityWebsite() {
       formData.append("file", file);
       formData.append("upload_preset", UPLOAD_PRESET);
 
-      // AUTO TYPE
       const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
 
       try {
@@ -73,6 +74,16 @@ export default function CyberSecurityWebsite() {
 
       }
     }
+  };
+
+  // DELETE FILE
+  const deleteFile = (indexToDelete) => {
+
+    const updatedFiles = uploadedFiles.filter(
+      (_, index) => index !== indexToDelete
+    );
+
+    setUploadedFiles(updatedFiles);
   };
 
   // PASSWORD PAGE
@@ -238,17 +249,28 @@ export default function CyberSecurityWebsite() {
                     Uploaded Study Material
                   </p>
 
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <div className="flex flex-col gap-3">
 
-                    <button className="w-full bg-green-400 text-black py-3 rounded-2xl font-bold hover:bg-white transition">
-                      Open Notes
+                    <a
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+
+                      <button className="w-full bg-green-400 text-black py-3 rounded-2xl font-bold hover:bg-white transition">
+                        Open Notes
+                      </button>
+
+                    </a>
+
+                    <button
+                      onClick={() => deleteFile(index)}
+                      className="w-full bg-red-500 text-white py-3 rounded-2xl font-bold hover:bg-red-700 transition"
+                    >
+                      Delete File
                     </button>
 
-                  </a>
+                  </div>
 
                 </div>
               ))}
