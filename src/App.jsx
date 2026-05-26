@@ -5,19 +5,25 @@ const UPLOAD_PRESET = "ndzksccj";
 
 export default function CyberSecurityWebsite() {
 
-  // PASSWORD SYSTEM
-  const [access, setAccess] = useState(false);
-  const [password, setPassword] = useState("");
+  // PERSONAL PASSWORD
+  const PERSONAL_PASSWORD = "anjan123";
 
-  const WEBSITE_PASSWORD = "anjan123";
+  const [personalAccess, setPersonalAccess] = useState(false);
+  const [personalPassword, setPersonalPassword] = useState("");
 
-  // FILE STORAGE
+  // NOTES STORAGE
   const [uploadedFiles, setUploadedFiles] = useState(() => {
     const saved = localStorage.getItem("uploadedFiles");
     return saved ? JSON.parse(saved) : [];
   });
 
-  // SAVE FILES
+  // PERSONAL IMAGE STORAGE
+  const [personalImages, setPersonalImages] = useState(() => {
+    const saved = localStorage.getItem("personalImages");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // SAVE NOTES
   useEffect(() => {
     localStorage.setItem(
       "uploadedFiles",
@@ -25,7 +31,15 @@ export default function CyberSecurityWebsite() {
     );
   }, [uploadedFiles]);
 
-  // FILE UPLOAD
+  // SAVE PERSONAL IMAGES
+  useEffect(() => {
+    localStorage.setItem(
+      "personalImages",
+      JSON.stringify(personalImages)
+    );
+  }, [personalImages]);
+
+  // NOTES UPLOAD
   const handleUpload = async (e) => {
 
     const files = Array.from(e.target.files);
@@ -60,23 +74,61 @@ export default function CyberSecurityWebsite() {
 
           alert("File Uploaded Successfully");
 
-        } else {
+        }
 
-          alert("Upload Failed");
-          console.log(data);
+      } catch (error) {
+
+        console.log(error);
+        alert("Upload Failed");
+
+      }
+    }
+  };
+
+  // PERSONAL IMAGE UPLOAD
+  const handlePersonalImageUpload = async (e) => {
+
+    const files = Array.from(e.target.files);
+
+    for (const file of files) {
+
+      const formData = new FormData();
+
+      formData.append("file", file);
+      formData.append("upload_preset", UPLOAD_PRESET);
+
+      const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+      try {
+
+        const response = await fetch(url, {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+
+          setPersonalImages((prev) => [
+            ...prev,
+            data.secure_url,
+          ]);
+
+          alert("Image Uploaded");
 
         }
 
       } catch (error) {
 
         console.log(error);
-        alert("Error Uploading File");
+        alert("Upload Failed");
 
       }
     }
   };
 
-  // DELETE FILE
+  // DELETE NOTES
   const deleteFile = (indexToDelete) => {
 
     const updatedFiles = uploadedFiles.filter(
@@ -85,54 +137,6 @@ export default function CyberSecurityWebsite() {
 
     setUploadedFiles(updatedFiles);
   };
-
-  // PASSWORD PAGE
-  if (!access) {
-
-    return (
-      <div className="bg-black min-h-screen flex items-center justify-center px-6">
-
-        <div className="bg-[#050505] border border-green-500 p-10 rounded-3xl w-full max-w-md text-center">
-
-          <h2 className="text-4xl font-bold text-green-400 mb-6">
-            Protected Website
-          </h2>
-
-          <p className="text-gray-300 mb-6">
-            Enter Password To Access
-          </p>
-
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl bg-black border border-green-500 text-white outline-none mb-6"
-          />
-
-          <button
-            onClick={() => {
-
-              if (password === WEBSITE_PASSWORD) {
-
-                setAccess(true);
-
-              } else {
-
-                alert("Wrong Password");
-
-              }
-
-            }}
-            className="w-full bg-green-400 text-black py-3 rounded-xl font-bold hover:bg-white transition"
-          >
-            Enter Website
-          </button>
-
-        </div>
-      </div>
-    );
-  }
 
   return (
 
@@ -143,7 +147,7 @@ export default function CyberSecurityWebsite() {
 
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
 
-          <h1 className="text-3xl font-extrabold text-green-400 tracking-wider">
+          <h1 className="text-3xl font-extrabold text-green-400">
             ANJAN CYBER
           </h1>
 
@@ -161,8 +165,8 @@ export default function CyberSecurityWebsite() {
               Upload
             </a>
 
-            <a href="#contact" className="hover:text-green-400">
-              Contact
+            <a href="#personal" className="hover:text-green-400">
+              Personal
             </a>
 
           </div>
@@ -176,10 +180,6 @@ export default function CyberSecurityWebsite() {
       >
 
         <div className="max-w-5xl">
-
-          <p className="text-green-400 text-xl mb-4 tracking-[5px]">
-            CYBER SECURITY • ETHICAL HACKING • NETWORKING
-          </p>
 
           <h2 className="text-5xl md:text-7xl font-black leading-tight mb-8">
 
@@ -214,10 +214,6 @@ export default function CyberSecurityWebsite() {
               Uploaded Notes
             </h3>
 
-            <p className="text-gray-400 text-lg">
-              Open uploaded PDFs and study materials.
-            </p>
-
           </div>
 
           {uploadedFiles.length === 0 ? (
@@ -237,17 +233,9 @@ export default function CyberSecurityWebsite() {
                   className="bg-[#0b0b0b] border border-green-500 rounded-3xl p-8"
                 >
 
-                  <div className="w-16 h-16 rounded-2xl bg-green-400 text-black flex items-center justify-center text-3xl font-black mb-6">
-                    {index + 1}
-                  </div>
-
                   <h4 className="text-2xl font-bold text-green-400 mb-4 break-words">
                     {file.name}
                   </h4>
-
-                  <p className="text-gray-300 mb-6">
-                    Uploaded Study Material
-                  </p>
 
                   <div className="flex flex-col gap-3">
 
@@ -257,7 +245,7 @@ export default function CyberSecurityWebsite() {
                       rel="noopener noreferrer"
                     >
 
-                      <button className="w-full bg-green-400 text-black py-3 rounded-2xl font-bold hover:bg-white transition">
+                      <button className="w-full bg-green-400 text-black py-3 rounded-2xl font-bold">
                         Open Notes
                       </button>
 
@@ -265,7 +253,7 @@ export default function CyberSecurityWebsite() {
 
                     <button
                       onClick={() => deleteFile(index)}
-                      className="w-full bg-red-500 text-white py-3 rounded-2xl font-bold hover:bg-red-700 transition"
+                      className="w-full bg-red-500 text-white py-3 rounded-2xl font-bold"
                     >
                       Delete File
                     </button>
@@ -293,10 +281,6 @@ export default function CyberSecurityWebsite() {
             Upload Notes & Images
           </h3>
 
-          <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-8 mb-10">
-            Upload PDFs, screenshots and cyber security notes.
-          </p>
-
           <div className="border-2 border-dashed border-green-500 rounded-3xl p-16 bg-black">
 
             <input
@@ -309,7 +293,7 @@ export default function CyberSecurityWebsite() {
 
             <label
               htmlFor="fileUpload"
-              className="bg-green-400 text-black px-10 py-4 rounded-2xl font-bold text-lg hover:bg-white transition duration-300 cursor-pointer inline-block"
+              className="bg-green-400 text-black px-10 py-4 rounded-2xl font-bold text-lg cursor-pointer inline-block"
             >
               Choose Files
             </label>
@@ -319,26 +303,98 @@ export default function CyberSecurityWebsite() {
         </div>
       </section>
 
-      {/* CONTACT */}
-      <section id="contact" className="py-24 px-6">
+      {/* PERSONAL SECTION */}
+      <section
+        id="personal"
+        className="py-24 px-6"
+      >
 
-        <div className="max-w-5xl mx-auto bg-[#050505] border border-green-500 rounded-[40px] p-12 text-center">
+        <div className="max-w-6xl mx-auto text-center">
 
-          <h3 className="text-5xl font-bold text-green-400 mb-8">
-            Contact Me
+          <h3 className="text-5xl font-bold text-green-400 mb-10">
+            Personal Details
           </h3>
 
-          <div className="space-y-5 text-xl text-gray-300">
+          {!personalAccess ? (
 
-            <p>
-              📧 Email: anjanghosh359@gmail.com
-            </p>
+            <div className="max-w-md mx-auto bg-[#050505] border border-green-500 p-10 rounded-3xl">
 
-            <p>
-              💻 GitHub: github.com/anjanghosh359-stack
-            </p>
+              <input
+                type="password"
+                placeholder="Enter Password"
+                value={personalPassword}
+                onChange={(e) => setPersonalPassword(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-black border border-green-500 text-white outline-none mb-6"
+              />
 
-          </div>
+              <button
+                onClick={() => {
+
+                  if (personalPassword === PERSONAL_PASSWORD) {
+
+                    setPersonalAccess(true);
+
+                  } else {
+
+                    alert("Wrong Password");
+
+                  }
+
+                }}
+                className="w-full bg-green-400 text-black py-3 rounded-xl font-bold"
+              >
+                Open Personal Details
+              </button>
+
+            </div>
+
+          ) : (
+
+            <div>
+
+              <div className="mb-10">
+
+                <input
+                  id="personalImageUpload"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handlePersonalImageUpload}
+                  className="hidden"
+                />
+
+                <label
+                  htmlFor="personalImageUpload"
+                  className="bg-green-400 text-black px-10 py-4 rounded-2xl font-bold text-lg cursor-pointer inline-block"
+                >
+                  Upload Personal Images
+                </label>
+
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+
+                {personalImages.map((image, index) => (
+
+                  <div
+                    key={index}
+                    className="border border-green-500 rounded-3xl overflow-hidden"
+                  >
+
+                    <img
+                      src={image}
+                      alt="personal"
+                      className="w-full h-80 object-cover"
+                    />
+
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+
+          )}
 
         </div>
       </section>
