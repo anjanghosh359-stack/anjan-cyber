@@ -5,25 +5,54 @@ const UPLOAD_PRESET = "ndzksccj";
 
 export default function CyberSecurityWebsite() {
 
-  // PERSONAL PASSWORD
+  // =========================
+  // PASSWORDS
+  // =========================
+
   const PERSONAL_PASSWORD = "anjan123";
+  const AI_PASSWORD = "anjangpt";
+
+  // =========================
+  // STATES
+  // =========================
 
   const [personalAccess, setPersonalAccess] = useState(false);
   const [personalPassword, setPersonalPassword] = useState("");
 
+  const [aiAccess, setAiAccess] = useState(false);
+  const [aiPassword, setAiPassword] = useState("");
+
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  // =========================
+  // GEMINI API KEY
+  // =========================
+
+  const API_KEY = "AIzaSyBJ5M_zpR8n6_xYV11lZF3zmVrfwRiWG88";
+
+  // =========================
   // NOTES STORAGE
+  // =========================
+
   const [uploadedFiles, setUploadedFiles] = useState(() => {
     const saved = localStorage.getItem("uploadedFiles");
     return saved ? JSON.parse(saved) : [];
   });
 
+  // =========================
   // PERSONAL IMAGE STORAGE
+  // =========================
+
   const [personalImages, setPersonalImages] = useState(() => {
     const saved = localStorage.getItem("personalImages");
     return saved ? JSON.parse(saved) : [];
   });
 
+  // =========================
   // SAVE NOTES
+  // =========================
+
   useEffect(() => {
     localStorage.setItem(
       "uploadedFiles",
@@ -31,7 +60,10 @@ export default function CyberSecurityWebsite() {
     );
   }, [uploadedFiles]);
 
+  // =========================
   // SAVE PERSONAL IMAGES
+  // =========================
+
   useEffect(() => {
     localStorage.setItem(
       "personalImages",
@@ -39,7 +71,10 @@ export default function CyberSecurityWebsite() {
     );
   }, [personalImages]);
 
-  // NOTES UPLOAD
+  // =========================
+  // FILE UPLOAD
+  // =========================
+
   const handleUpload = async (e) => {
 
     const files = Array.from(e.target.files);
@@ -73,19 +108,20 @@ export default function CyberSecurityWebsite() {
           ]);
 
           alert("File Uploaded Successfully");
-
         }
 
       } catch (error) {
 
         console.log(error);
         alert("Upload Failed");
-
       }
     }
   };
 
+  // =========================
   // PERSONAL IMAGE UPLOAD
+  // =========================
+
   const handlePersonalImageUpload = async (e) => {
 
     const files = Array.from(e.target.files);
@@ -116,19 +152,20 @@ export default function CyberSecurityWebsite() {
           ]);
 
           alert("Image Uploaded");
-
         }
 
       } catch (error) {
 
         console.log(error);
         alert("Upload Failed");
-
       }
     }
   };
 
-  // DELETE NOTES
+  // =========================
+  // DELETE FILE
+  // =========================
+
   const deleteFile = (indexToDelete) => {
 
     const updatedFiles = uploadedFiles.filter(
@@ -138,11 +175,64 @@ export default function CyberSecurityWebsite() {
     setUploadedFiles(updatedFiles);
   };
 
+  // =========================
+  // ASK AI
+  // =========================
+
+  const askAI = async () => {
+
+    if (!question) return;
+
+    setAnswer("Thinking...");
+
+    try {
+
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text:
+                      "You are ANJAN GPT, a cyber security and networking AI assistant. Answer only cyber security, Linux, networking and ethical hacking related questions.\n\nQuestion: " +
+                      question,
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      const text =
+        data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      setAnswer(text || "No response");
+
+    } catch (error) {
+
+      console.log(error);
+
+      setAnswer("Error getting response");
+    }
+  };
+
   return (
 
     <div className="bg-black text-white min-h-screen font-sans overflow-x-hidden">
 
       {/* NAVBAR */}
+
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/70 border-b border-green-500">
 
         <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
@@ -169,11 +259,16 @@ export default function CyberSecurityWebsite() {
               Personal
             </a>
 
+            <a href="#ai" className="hover:text-green-400">
+              ANJAN GPT
+            </a>
+
           </div>
         </div>
       </nav>
 
       {/* HERO */}
+
       <section
         id="home"
         className="flex items-center justify-center min-h-screen px-6 text-center"
@@ -204,6 +299,7 @@ export default function CyberSecurityWebsite() {
       </section>
 
       {/* NOTES */}
+
       <section id="notes" className="py-24 px-6">
 
         <div className="max-w-7xl mx-auto">
@@ -269,7 +365,8 @@ export default function CyberSecurityWebsite() {
         </div>
       </section>
 
-      {/* UPLOAD */}
+      {/* FILE UPLOAD */}
+
       <section
         id="upload"
         className="py-24 px-6 bg-[#050505]"
@@ -303,7 +400,8 @@ export default function CyberSecurityWebsite() {
         </div>
       </section>
 
-      {/* PERSONAL SECTION */}
+      {/* PERSONAL */}
+
       <section
         id="personal"
         className="py-24 px-6"
@@ -337,7 +435,6 @@ export default function CyberSecurityWebsite() {
                   } else {
 
                     alert("Wrong Password");
-
                   }
 
                 }}
@@ -399,7 +496,82 @@ export default function CyberSecurityWebsite() {
         </div>
       </section>
 
+      {/* AI SECTION */}
+
+      <section
+        id="ai"
+        className="py-24 px-6 bg-[#050505]"
+      >
+
+        <div className="max-w-4xl mx-auto">
+
+          <h3 className="text-5xl font-bold text-green-400 mb-10 text-center">
+            ANJAN GPT
+          </h3>
+
+          {!aiAccess ? (
+
+            <div className="bg-black border border-green-500 rounded-3xl p-10">
+
+              <input
+                type="password"
+                placeholder="Enter AI Password"
+                value={aiPassword}
+                onChange={(e) => setAiPassword(e.target.value)}
+                className="w-full bg-[#050505] border border-green-500 rounded-2xl p-4 text-white outline-none mb-6"
+              />
+
+              <button
+                onClick={() => {
+
+                  if (aiPassword === AI_PASSWORD) {
+
+                    setAiAccess(true);
+
+                  } else {
+
+                    alert("Wrong Password");
+                  }
+
+                }}
+                className="bg-green-400 text-black px-10 py-4 rounded-2xl font-bold"
+              >
+                Open ANJAN GPT
+              </button>
+
+            </div>
+
+          ) : (
+
+            <div>
+
+              <textarea
+                placeholder="Ask cyber security or networking questions..."
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                className="w-full h-40 bg-black border border-green-500 rounded-2xl p-5 text-white outline-none mb-6"
+              />
+
+              <button
+                onClick={askAI}
+                className="bg-green-400 text-black px-10 py-4 rounded-2xl font-bold"
+              >
+                Ask ANJAN GPT
+              </button>
+
+              <div className="mt-10 bg-black border border-green-500 rounded-2xl p-6 min-h-[150px] whitespace-pre-wrap">
+                {answer}
+              </div>
+
+            </div>
+
+          )}
+
+        </div>
+      </section>
+
       {/* FOOTER */}
+
       <footer className="border-t border-green-500 py-8 text-center text-gray-400 bg-black">
         © 2026 ANJAN CYBER SECURITY
       </footer>
